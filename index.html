@@ -302,6 +302,40 @@
     background: rgba(212,168,83,0.12); border: 1px solid rgba(212,168,83,0.3);
     border-radius: 6px; padding: 4px 12px; font-size: 13px; font-weight: 600; color: #d4a853;
   }
+
+  .carousel{
+    margin: auto;
+    width: 90%;
+    display: flex;
+    overflow-x: auto;
+  }
+  .carousel::-webkit-scrollbar{
+    display: none;
+  }
+  .groub{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8em;
+    animation: spin 40s infinite linear;
+    padding-right: 8em;
+  }
+  .card{
+    flex: 0 0 5em;
+    height: 20em;
+    padding: 1em;
+    font-size: 1em;
+    border-radius: 0.3em;
+    text-align: center;
+    align-content: center;
+  }
+  .card img{
+    transform: scale(350%);
+  }
+  @keyframes spin{
+    from {translate: 0;}
+    to {translate: -100%;}
+  }
 </style>
 </head>
 <body>
@@ -341,6 +375,7 @@
     <a href="#about">About</a>
     <a href="#menu">Menu</a>
     <a href="#gaming">Gaming</a>
+    <a href="#gallery">gallery</a>
     <a href="#reviews">Reviews</a>
     <a href="#contact">Contact</a>
     <a href="https://maps.app.goo.gl/nwLAgyvmQ5mNUs118" target="_blank" rel="noopener" style="color:#d4a853">📍 Get Directions</a>
@@ -544,7 +579,67 @@
     </div>
   </div>
 </section>
-
+<section id="gallery">
+  <div class="text-center mb-16 reveal">
+  <p class="section-tag mb-3">Our Collection</p>
+  <h2 class="section-title">A Look <span class="text-gold">Inside</span></h2>
+  <div class="flex items-center justify-center gap-3 mt-5">
+    <span class="text-smoke" style="font-size:0.9rem">Freshly captured</span>
+    <span style="font-family:'Bebas Neue',cursive;font-size:1.8rem;color:#d4a853">MOMENTS</span>
+    <span class="text-smoke" style="font-size:0.9rem">from our bar</span>
+  </div>
+</div>
+  <div class="carousel">
+    <div class="groub">
+      <div class="card"><img src="1.jpg" alt=""></div>
+      <div class="card"><img src="2.jpg" alt=""></div>
+      <div class="card"><img src="3.jpg" alt=""></div>
+      <div class="card"><img src="4.jpg" alt=""></div>
+      <div class="card"><img src="5.jpg" alt=""></div>
+      <div class="card"><img src="6.jpg" alt=""></div>
+      <div class="card"><img src="7.jpg" alt=""></div>
+      <div class="card"><img src="8.jpg" alt=""></div>
+      <div class="card"><img src="9.jpg" alt=""></div>
+      <div class="card"><img src="10.jpg" alt=""></div>
+      <div class="card"><img src="12.jpg" alt=""></div>
+      <div class="card"><img src="13.jpg" alt=""></div>
+      <div class="card"><img src="14.jpg" alt=""></div>
+      <div class="card"><img src="15.jpg" alt=""></div>
+      <div class="card"><img src="16.jpg" alt=""></div>
+      <div class="card"><img src="17.jpg" alt=""></div>
+      <div class="card"><img src="18.jpg" alt=""></div>
+      <div class="card"><img src="19.jpg" alt=""></div>
+      <div class="card"><img src="20.jpg" alt=""></div>
+      <div class="card"><img src="21.jpg" alt=""></div>
+      <div class="card"><img src="22.jpg" alt=""></div>
+      <div class="card"><img src="23.jpg" alt=""></div>
+    </div>
+    <div aria-hidden class="groub">
+      <div class="card"><img src="1.jpg" alt=""></div>
+      <div class="card"><img src="2.jpg" alt=""></div>
+      <div class="card"><img src="3.jpg" alt=""></div>
+      <div class="card"><img src="4.jpg" alt=""></div>
+      <div class="card"><img src="5.jpg" alt=""></div>
+      <div class="card"><img src="6.jpg" alt=""></div>
+      <div class="card"><img src="7.jpg" alt=""></div>
+      <div class="card"><img src="8.jpg" alt=""></div>
+      <div class="card"><img src="9.jpg" alt=""></div>
+      <div class="card"><img src="10.jpg" alt=""></div>
+      <div class="card"><img src="12.jpg" alt=""></div>
+      <div class="card"><img src="13.jpg" alt=""></div>
+      <div class="card"><img src="14.jpg" alt=""></div>
+      <div class="card"><img src="15.jpg" alt=""></div>
+      <div class="card"><img src="16.jpg" alt=""></div>
+      <div class="card"><img src="17.jpg" alt=""></div>
+      <div class="card"><img src="18.jpg" alt=""></div>
+      <div class="card"><img src="19.jpg" alt=""></div>
+      <div class="card"><img src="20.jpg" alt=""></div>
+      <div class="card"><img src="21.jpg" alt=""></div>
+      <div class="card"><img src="22.jpg" alt=""></div>
+      <div class="card"><img src="23.jpg" alt=""></div>
+    </div>
+  </div>
+</section>
 <!-- ════════════════════════════ TESTIMONIALS ════════════════════════════ -->
 <section id="reviews" class="py-28 relative" style="background:rgba(15,15,26,0.6)">
   <div class="max-w-7xl mx-auto px-6">
