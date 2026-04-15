@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Risk Cafe & PlayStation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          display: ['Bebas Neue', 'cursive'],
+          serif: ['Playfair Display', 'Georgia', 'serif'],
+          body: ['Outfit', 'sans-serif'],
+        },
+        colors: {
+          night:  { DEFAULT: '#08080f', 800: '#0f0f1a', 700: '#14141f', 600: '#1c1c2e', 500: '#252540' },
+          gold:   { DEFAULT: '#d4a853', light: '#e8c47a', dark: '#a07830', dim: 'rgba(212,168,83,0.12)' },
+          cyan:   { DEFAULT: '#00d4ff', dim: 'rgba(0,212,255,0.12)', glow: 'rgba(0,212,255,0.35)' },
+          smoke:  { DEFAULT: '#9898b0', light: '#c5c5d8', dark: '#5a5a78' },
+        },
+      }
+    }
+  }
+</script>
+<style>
+  /* ─── Base ─── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: #08080f; color: #c5c5d8; font-family: 'Outfit', sans-serif; overflow-x: hidden; }
+
+  /* ─── Noise overlay ─── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    opacity: .35;
+  }
+
+  /* ─── Custom scrollbar ─── */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: #08080f; }
+  ::-webkit-scrollbar-thumb { background: #d4a853; border-radius: 10px; }
+
+  .social{
+    font-size: 1rem;
+  }
+  .social :hover{
+    font-size: 1.5rem;
+    transition: ease 0.8s;
+
+  }
+  /* ─── Navbar ─── */
+  #navbar {
+    position: fixed; top: 0; width: 100%; z-index: 100;
+    transition: background .4s, backdrop-filter .4s, box-shadow .4s;
+  }
+  #navbar.scrolled {
+    background: rgba(8,8,15,0.88);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 1px 0 rgba(212,168,83,0.2);
+  }
+  .nav-link {
+    position: relative; font-weight: 500; font-size: 13px; letter-spacing: .08em;
+    text-transform: uppercase; color: #9898b0; transition: color .25s;
+  }
+  .nav-link::after {
+    content: ''; position: absolute; left: 0; bottom: -4px;
+    width: 0; height: 1.5px; background: #d4a853; transition: width .3s;
+  }
+  .nav-link:hover { color: #d4a853; }
+  .nav-link:hover::after { width: 100%; }
+
+  /* ─── Hero ─── */
+  #hero {
+    min-height: 100vh; position: relative; display: flex; align-items: center;
+    background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(212,168,83,0.08) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 40% at 80% 20%, rgba(0,212,255,0.05) 0%, transparent 60%),
+                #08080f;
+  }
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(212,168,83,0.04) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(212,168,83,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+  }
+  .hero-line {
+    display: block; overflow: hidden;
+    animation: slideUp .9s cubic-bezier(.16,1,.3,1) both;
+  }
+  .hero-line:nth-child(2) { animation-delay: .12s; }
+  .hero-line:nth-child(3) { animation-delay: .24s; }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(50px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .badge-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    border: 1px solid rgba(212,168,83,0.35); border-radius: 999px;
+    padding: 6px 18px; font-size: 12px; letter-spacing: .12em;
+    text-transform: uppercase; color: #d4a853; font-weight: 500;
+    animation: fadeIn 1.2s .5s both;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .dot-pulse {
+    width: 7px; height: 7px; border-radius: 50%; background: #d4a853;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(212,168,83,0.6); }
+    50%       { box-shadow: 0 0 0 6px transparent; }
+  }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: #d4a853; color: #08080f; font-family: 'Outfit', sans-serif;
+    font-weight: 600; font-size: 14px; letter-spacing: .06em;
+    text-transform: uppercase; padding: 15px 36px; border-radius: 4px;
+    border: none; cursor: pointer; transition: transform .2s, box-shadow .3s;
+    text-decoration: none;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(212,168,83,0.4);
+  }
+  .btn-outline {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: transparent; color: #c5c5d8;
+    font-family: 'Outfit', sans-serif; font-weight: 500; font-size: 14px;
+    letter-spacing: .06em; text-transform: uppercase;
+    padding: 14px 36px; border-radius: 4px; border: 1px solid rgba(197,197,216,0.25);
+    cursor: pointer; transition: border-color .25s, color .25s, transform .2s;
+    text-decoration: none;
+  }
+  .btn-outline:hover { border-color: #d4a853; color: #d4a853; transform: translateY(-2px); }
+
+  /* ─── Section headers ─── */
+  .section-tag {
+    font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
+    color: #d4a853; font-weight: 600;
+  }
+  .section-title {
+    font-family: 'Bebas Neue', cursive; font-size: clamp(2.8rem, 6vw, 5rem);
+    color: #fff; line-height: 1.05; letter-spacing: .02em;
+  }
+
+  /* ─── About ─── */
+  #about { position: relative; }
+  .about-card {
+    border: 1px solid rgba(212,168,83,0.15);
+    background: rgba(20,20,31,0.7); border-radius: 12px;
+    padding: 32px; transition: border-color .3s, transform .3s;
+    backdrop-filter: blur(6px);
+  }
+  .about-card:hover { border-color: rgba(212,168,83,0.4); transform: translateY(-4px); }
+  .icon-circle {
+    width: 52px; height: 52px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+  .icon-gold { background: rgba(212,168,83,0.15); }
+  .icon-cyan { background: rgba(0,212,255,0.1); }
+
+  /* ─── Menu & Features ─── */
+  #menu { position: relative; }
+  .menu-card {
+    background: rgba(20,20,31,0.8); border: 1px solid rgba(0,212,255,0.12);
+    border-radius: 12px; padding: 28px;
+    transition: transform .3s, border-color .3s, box-shadow .3s;
+    backdrop-filter: blur(8px);
+  }
+  .menu-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(0,212,255,0.45);
+    box-shadow: 0 16px 48px rgba(0,212,255,0.1);
+  }
+  .game-card {
+    background: rgba(20,20,31,0.8); border: 1px solid rgba(212,168,83,0.12);
+    border-radius: 12px; padding: 28px;
+    transition: transform .3s, border-color .3s, box-shadow .3s;
+    backdrop-filter: blur(8px);
+  }
+  .game-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(212,168,83,0.45);
+    box-shadow: 0 16px 48px rgba(212,168,83,0.1);
+  }
+  .price-tag {
+    font-family: 'Bebas Neue', cursive; font-size: 2rem; color: #00d4ff;
+    letter-spacing: .04em;
+  }
+
+  /* ─── Divider ─── */
+  .fancy-divider {
+    display: flex; align-items: center; gap: 16px; margin: 0 auto;
+    max-width: 320px;
+  }
+  .fancy-divider span { flex: 1; height: 1px; background: rgba(212,168,83,0.2); }
+  .fancy-divider em { color: #d4a853; font-style: normal; font-size: 20px; }
+
+  /* ─── Stars ─── */
+  .stars { color: #d4a853; letter-spacing: 2px; font-size: 15px; }
+
+  /* ─── Testimonials ─── */
+  .review-card {
+    background: rgba(20,20,31,0.85); border: 1px solid rgba(212,168,83,0.12);
+    border-radius: 14px; padding: 32px;
+    transition: transform .3s, border-color .3s;
+    backdrop-filter: blur(8px); position: relative;
+  }
+  .review-card::before {
+    content: '\201C';
+    font-family: 'Playfair Display', serif;
+    font-size: 80px; color: rgba(212,168,83,0.15);
+    position: absolute; top: 10px; left: 24px; line-height: 1;
+  }
+  .review-card:hover { transform: translateY(-5px); border-color: rgba(212,168,83,0.35); }
+  .avatar {
+    width: 46px; height: 46px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 15px; flex-shrink: 0;
+  }
+
+  /* ─── Stats bar ─── */
+  .stat-item {
+    text-align: center; border-right: 1px solid rgba(212,168,83,0.15);
+    padding: 24px 40px;
+  }
+  .stat-item:last-child { border-right: none; }
+
+  /* ─── Contact / Footer ─── */
+  #contact {
+    background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(212,168,83,0.05) 0%, transparent 70%), #0f0f1a;
+    border-top: 1px solid rgba(212,168,83,0.15);
+  }
+  .contact-detail {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 18px 0; border-bottom: 1px solid rgba(212,168,83,0.08);
+  }
+  .contact-detail:last-child { border-bottom: none; }
+  .detail-icon {
+    width: 40px; height: 40px; border-radius: 8px; flex-shrink: 0;
+    background: rgba(212,168,83,0.1); display: flex; align-items: center;
+    justify-content: center; font-size: 17px;
+  }
+  .map-placeholder {
+    width: 100%; height: 280px; border-radius: 12px; overflow: hidden;
+    border: 1px solid rgba(212,168,83,0.2); position: relative;
+    background: #14141f;
+  }
+  .map-placeholder iframe { width: 100%; height: 100%; border: none; filter: invert(0.85) hue-rotate(180deg); }
+
+  /* ─── Mobile nav ─── */
+  #mobile-menu {
+    display: none; flex-direction: column; gap: 4px;
+    background: rgba(8,8,15,0.97); backdrop-filter: blur(20px);
+    padding: 20px 24px; border-bottom: 1px solid rgba(212,168,83,0.15);
+  }
+  #mobile-menu.open { display: flex; }
+  #mobile-menu a {
+    color: #9898b0; text-transform: uppercase; letter-spacing: .08em;
+    font-size: 13px; font-weight: 500; padding: 12px 0;
+    border-bottom: 1px solid rgba(212,168,83,0.07);
+    transition: color .2s;
+  }
+  #mobile-menu a:last-child { border-bottom: none; }
+  #mobile-menu a:hover { color: #d4a853; }
+
+  /* ─── Hamburger ─── */
+  .ham { display: flex; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+  .ham span {
+    display: block; width: 22px; height: 2px; background: #c5c5d8;
+    border-radius: 2px; transition: all .3s;
+  }
+  .ham.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .ham.active span:nth-child(2) { opacity: 0; }
+  .ham.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* ─── Scroll reveal ─── */
+  .reveal { opacity: 0; transform: translateY(32px); transition: opacity .7s, transform .7s; }
+  .reveal.visible { opacity: 1; transform: none; }
+  .reveal-left { opacity: 0; transform: translateX(-32px); transition: opacity .7s, transform .7s; }
+  .reveal-left.visible { opacity: 1; transform: none; }
+  .reveal-right { opacity: 0; transform: translateX(32px); transition: opacity .7s, transform .7s; }
+  .reveal-right.visible { opacity: 1; transform: none; }
+
+  /* ─── Glow accents ─── */
+  .glow-gold { text-shadow: 0 0 24px rgba(212,168,83,0.4); }
+  .glow-cyan  { text-shadow: 0 0 24px rgba(0,212,255,0.5); }
+  .text-gold  { color: #d4a853; }
+  .text-cyan  { color: #00d4ff; }
+  .text-smoke { color: #9898b0; }
+
+  /* ─── Rating badge ─── */
+  .rating-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(212,168,83,0.12); border: 1px solid rgba(212,168,83,0.3);
+    border-radius: 6px; padding: 4px 12px; font-size: 13px; font-weight: 600; color: #d4a853;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ NAVBAR ═══════════════════════════════ -->
+<header id="navbar">
+  <nav class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+    <!-- Logo -->
+    <a href="#hero" class="flex items-center gap-3 group" style="text-decoration:none">
+      <div style="width:38px;height:38px;border-radius:8px;background:linear-gradient(135deg,#d4a853,#a07830);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;font-size:20px;color:#08080f;font-weight:700;flex-shrink:0">R</div>
+      <div>
+        <span style="font-family:'Bebas Neue',cursive;font-size:18px;color:#fff;letter-spacing:.06em">Risk</span>
+        <span style="font-family:'Outfit',sans-serif;font-size:10px;display:block;color:#9898b0;letter-spacing:.15em;text-transform:uppercase;line-height:1;margin-top:1px">Cafe & PlayStation</span>
+      </div>
+    </a>
+    <!-- Desktop links -->
+    <div class="hidden md:flex items-center gap-8">
+      <a href="#about" class="nav-link">About</a>
+      <a href="#menu" class="nav-link">Menu</a>
+      <a href="#gaming" class="nav-link">Gaming</a>
+      <a href="#reviews" class="nav-link">Reviews</a>
+      <a href="#contact" class="nav-link">Contact</a>
+    </div>
+    <!-- CTA + hamburger -->
+    <div class="flex items-center gap-4">
+      <a href="https://maps.app.goo.gl/nwLAgyvmQ5mNUs118" target="_blank" rel="noopener" class="hidden md:inline-flex btn-primary" style="padding:10px 24px;font-size:12px">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Get Directions
+      </a>
+      <button id="ham-btn" class="ham md:hidden" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+  <!-- Mobile menu -->
+  <div id="mobile-menu">
+    <a href="#about">About</a>
+    <a href="#menu">Menu</a>
+    <a href="#gaming">Gaming</a>
+    <a href="#reviews">Reviews</a>
+    <a href="#contact">Contact</a>
+    <a href="https://maps.app.goo.gl/nwLAgyvmQ5mNUs118" target="_blank" rel="noopener" style="color:#d4a853">📍 Get Directions</a>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════ HERO ══════════════════════════════════ -->
+<section id="hero">
+  <div class="hero-grid"></div>
+  <div class="max-w-7xl mx-auto px-6 w-full pt-28 pb-20 relative z-10">
+    <div class="max-w-3xl">
+      <div class="badge-pill mb-8">
+        <span class="dot-pulse"></span>
+        Open 24 Hours · Cairo's Premier Gaming Lounge
+      </div>
+      <h1 style="font-family:'Bebas Neue',cursive; font-size:clamp(4rem,10vw,8.5rem); line-height:0.95; letter-spacing:.02em; color:#fff; margin-bottom:28px;">
+        <span class="hero-line">Where <span class="text-gold glow-gold">Coffee</span></span>
+        <span class="hero-line">Meets <span class="text-cyan glow-cyan">Gaming</span></span>
+        <span class="hero-line" style="color:#9898b0;font-size:clamp(2.2rem,5vw,4.5rem)">Risk Cafe & PlayStation</span>
+      </h1>
+      <p style="color:#9898b0;font-size:clamp(1rem,2vw,1.15rem);line-height:1.7;max-width:540px;margin-bottom:40px;animation:fadeIn 1s .6s both;opacity:0">
+        A sanctuary where your favourite Mojito and the latest PlayStation titles coexist in perfect harmony. Private rooms, unmatched atmosphere — zero compromises.
+      </p>
+      <div style="display:flex;flex-wrap:wrap;gap:14px;animation:fadeIn 1s .8s both;opacity:0">
+        <a href="https://maps.app.goo.gl/nwLAgyvmQ5mNUs118" target="_blank" rel="noopener" class="btn-primary">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Get Directions
+        </a>
+        <a href="#menu" class="btn-outline">Explore Menu</a>
+      </div>
+      <!-- Quick stats -->
+      <div style="display:flex;flex-wrap:wrap;gap:32px;margin-top:64px;padding-top:40px;border-top:1px solid rgba(212,168,83,0.15);animation:fadeIn 1s 1s both;opacity:0">
+        <div>
+          <p style="font-family:'Bebas Neue',cursive;font-size:2.4rem;color:#d4a853;line-height:1">4.9 ★</p>
+          <p style="font-size:12px;color:#5a5a78;letter-spacing:.08em;text-transform:uppercase;margin-top:2px">Google Rating</p>
+        </div>
+        <div>
+          <p style="font-family:'Bebas Neue',cursive;font-size:2.4rem;color:#00d4ff;line-height:1">24 / 7</p>
+          <p style="font-size:12px;color:#5a5a78;letter-spacing:.08em;text-transform:uppercase;margin-top:2px">Always Open</p>
+        </div>
+        <div>
+          <p style="font-family:'Bebas Neue',cursive;font-size:2.4rem;color:#d4a853;line-height:1">100%</p>
+          <p style="font-size:12px;color:#5a5a78;letter-spacing:.08em;text-transform:uppercase;margin-top:2px">Private Rooms</p>
+        </div>
+        <div>
+          <p style="font-family:'Bebas Neue',cursive;font-size:2.4rem;color:#00d4ff;line-height:1">PS5</p>
+          <p style="font-size:12px;color:#5a5a78;letter-spacing:.08em;text-transform:uppercase;margin-top:2px">Latest Consoles</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Scroll cue -->
+  <div style="position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;animation:fadeIn 1s 1.5s both;opacity:0">
+    <span style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#5a5a78">Scroll</span>
+    <div style="width:1px;height:40px;background:linear-gradient(to bottom,#d4a853,transparent)"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ ABOUT ═══════════════════════════════ -->
+<section id="about" class="py-28 relative">
+  <div class="max-w-7xl mx-auto px-6">
+    <!-- Header -->
+    <div class="text-center mb-16 reveal">
+      <p class="section-tag mb-3">Who We Are</p>
+      <h2 class="section-title">More Than a <span class="text-gold">Cafe.</span><br>More Than a <span class="text-cyan">Game Room.</span></h2>
+      <p class="text-smoke mt-5 max-w-xl mx-auto" style="line-height:1.75;font-size:1.05rem">
+        Risk Cafe & PlayStation was born from a simple idea: life's best moments happen when great food, great drinks, and great games share the same space.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-8 mb-16">
+      <!-- Story -->
+      <div class="reveal-left about-card">
+        <div class="icon-circle icon-gold mb-5">☕</div>
+        <h3 style="font-family:'Playfair Display',serif;font-size:1.4rem;color:#fff;margin-bottom:12px">The Cafe Side</h3>
+        <p class="text-smoke" style="line-height:1.8">
+          Our signature Mojitos — Passion Fruit and Blueberry — are crafted fresh, every time. Alongside a curated menu of hot and cold drinks, we ensure your palate is as thrilled as your reflexes. No shortcuts, no syrups from a bottle.
+        </p>
+      </div>
+      <!-- Gaming -->
+      <div class="reveal-right about-card" style="border-color:rgba(0,212,255,0.12)">
+        <div class="icon-circle icon-cyan mb-5">🎮</div>
+        <h3 style="font-family:'Playfair Display',serif;font-size:1.4rem;color:#fff;margin-bottom:12px">The Gaming Side</h3>
+        <p class="text-smoke" style="line-height:1.8">
+          PlayStation 5 with the latest titles. Crystal-clear 4K displays. Surround sound that pulls you inside the game. Whether you come solo, with friends, or with family — every session is immersive, every room is yours.
+        </p>
+      </div>
+    </div>
+
+    <!-- 4 pillars -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-5 reveal">
+      <div class="about-card text-center" style="padding:24px 16px">
+        <div class="text-gold" style="font-size:28px;margin-bottom:10px">🔒</div>
+        <h4 style="color:#fff;font-weight:600;font-size:0.95rem;margin-bottom:6px">Family Privacy</h4>
+        <p class="text-smoke" style="font-size:0.82rem;line-height:1.6">Fully private rooms — no strangers, no interruptions.</p>
+      </div>
+      <div class="about-card text-center" style="padding:24px 16px">
+        <div class="text-cyan" style="font-size:28px;margin-bottom:10px">🕐</div>
+        <h4 style="color:#fff;font-weight:600;font-size:0.95rem;margin-bottom:6px">24 / 7 Access</h4>
+        <p class="text-smoke" style="font-size:0.82rem;line-height:1.6">We never close. Game all night, sip coffee at dawn.</p>
+      </div>
+      <div class="about-card text-center" style="padding:24px 16px">
+        <div class="text-gold" style="font-size:28px;margin-bottom:10px">⭐</div>
+        <h4 style="color:#fff;font-weight:600;font-size:0.95rem;margin-bottom:6px">4.9 Star Rated</h4>
+        <p class="text-smoke" style="font-size:0.82rem;line-height:1.6">Consistently loved by hundreds of visitors.</p>
+      </div>
+      <div class="about-card text-center" style="padding:24px 16px">
+        <div class="text-cyan" style="font-size:28px;margin-bottom:10px">🎯</div>
+        <h4 style="color:#fff;font-weight:600;font-size:0.95rem;margin-bottom:6px">Premium Setup</h4>
+        <p class="text-smoke" style="font-size:0.82rem;line-height:1.6">PS5, 4K displays, surround sound — always upgraded.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════ MENU — MOJITOS ══════════════════════════ -->
+<section id="menu" class="py-28 relative" style="background:linear-gradient(180deg,transparent 0%,rgba(0,212,255,0.02) 50%,transparent 100%)">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-16 reveal">
+      <p class="section-tag mb-3">Signature Drinks</p>
+      <h2 class="section-title">Our <span class="text-cyan">Best</span> Collection</h2>
+      <p class="text-smoke mt-5 max-w-lg mx-auto" style="line-height:1.75">
+        Two flavours, one obsession. Each Mojito is a reason to stay longer.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+      <!-- Passion Fruit -->
+      <div class="menu-card reveal-left">
+        <div style="font-size:50px;margin-bottom:18px;line-height:1">🍋</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <h3 style="font-family:'Playfair Display',serif;font-size:1.35rem;color:#fff">Passion Fruit Mojito</h3>
+          <span class="price-tag">EGP 75</span>
+        </div>
+        <p class="text-smoke" style="font-size:0.9rem;line-height:1.75;margin-bottom:20px">
+          A tropical explosion of fresh passion fruit pulp, muddled mint leaves, zesty lime, and sparkling soda — cool, vibrant, and irresistible.
+        </p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <span style="background:rgba(0,212,255,0.1);color:#00d4ff;font-size:11px;padding:4px 12px;border-radius:999px;letter-spacing:.06em">Tropical</span>
+          <span style="background:rgba(0,212,255,0.1);color:#00d4ff;font-size:11px;padding:4px 12px;border-radius:999px;letter-spacing:.06em">Fresh Mint</span>
+          <span style="background:rgba(0,212,255,0.1);color:#00d4ff;font-size:11px;padding:4px 12px;border-radius:999px;letter-spacing:.06em">Signature</span>
+        </div>
+      </div>
+      <!-- Blueberry -->
+      <div class="menu-card reveal-right">
+        <div style="font-size:50px;margin-bottom:18px;line-height:1">🥭</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <h3 style="font-family:'Playfair Display',serif;font-size:1.35rem;color:#fff">Mango Juice</h3>
+          <span class="price-tag">EGP 70</span>
+        </div>
+        <p class="text-smoke" style="font-size:0.9rem;line-height:1.75;margin-bottom:20px">
+          Sun-ripened mangoes pressed and strained into a smooth, vibrant juice. Served chilled, this highlights the pure, intense sweetness and creamy texture of the fruit in its most unadulterated form.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <span style="background:rgba(212,168,83,0.1);color:#d4a853;font-size:11px;padding:4px 12px;border-radius:999px;letter-spacing:.06em">Mango</span>
+          <span style="background:rgba(212,168,83,0.1);color:#d4a853;font-size:11px;padding:4px 12px;border-radius:999px;letter-spacing:.06em">Sweet &amp; Tart</span>
+          <span style="background:rgba(212,168,83,0.1);color:#d4a853;font-size:11px;padding:4px 12px;border-radius:999px;letter-spacing:.06em">Best Seller</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fancy-divider my-20 reveal"><span></span><em>☕</em><span></span></div>
+
+    <!-- Gaming features -->
+    <div id="gaming">
+      <div class="text-center mb-16 reveal">
+        <p class="section-tag mb-3">Gaming Experience</p>
+        <h2 class="section-title">Next-Level <span class="text-gold">Gaming Rooms</span></h2>
+      </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="game-card reveal" style="transition-delay:.05s">
+          <div style="font-size:36px;margin-bottom:16px">🎮</div>
+          <h3 style="color:#fff;font-weight:600;font-size:1.05rem;margin-bottom:8px">PlayStation 5</h3>
+          <p class="text-smoke" style="font-size:0.88rem;line-height:1.7">The latest Sony console with a massive library of titles — from FIFA to action epics. Always the newest generation.</p>
+        </div>
+        <div class="game-card reveal" style="transition-delay:.1s">
+          <div style="font-size:36px;margin-bottom:16px">📺</div>
+          <h3 style="color:#fff;font-weight:600;font-size:1.05rem;margin-bottom:8px">4K Displays</h3>
+          <p class="text-smoke" style="font-size:0.88rem;line-height:1.7">Crisp ultra-high-definition screens sized for maximum immersion. Every pixel, every frame — in stunning clarity.</p>
+        </div>
+        <div class="game-card reveal" style="transition-delay:.15s">
+          <div style="font-size:36px;margin-bottom:16px">🔊</div>
+          <h3 style="color:#fff;font-weight:600;font-size:1.05rem;margin-bottom:8px">Surround Sound</h3>
+          <p class="text-smoke" style="font-size:0.88rem;line-height:1.7">Feel every explosion, every footstep, every score. Our audio setup puts you inside the game — not just watching it.</p>
+        </div>
+        <div class="game-card reveal" style="transition-delay:.2s">
+          <div style="font-size:36px;margin-bottom:16px">🚪</div>
+          <h3 style="color:#fff;font-weight:600;font-size:1.05rem;margin-bottom:8px">Private Rooms</h3>
+          <p class="text-smoke" style="font-size:0.88rem;line-height:1.7">Each room is fully enclosed and reserved only for your group. Perfect for families, couples, or squads who want their own space.</p>
+        </div>
+        <div class="game-card reveal" style="transition-delay:.25s">
+          <div style="font-size:36px;margin-bottom:16px">🌙</div>
+          <h3 style="color:#fff;font-weight:600;font-size:1.05rem;margin-bottom:8px">24-Hour Sessions</h3>
+          <p class="text-smoke" style="font-size:0.88rem;line-height:1.7">No closing time. Book late-night sessions, all-nighters, or early morning rounds — we're always open and ready.</p>
+        </div>
+        <div class="game-card reveal" style="transition-delay:.3s">
+          <div style="font-size:36px;margin-bottom:16px">🍹</div>
+          <h3 style="color:#fff;font-weight:600;font-size:1.05rem;margin-bottom:8px">In-Room Service</h3>
+          <p class="text-smoke" style="font-size:0.88rem;line-height:1.7">Order directly to your gaming room. Signature Mojitos, hot drinks, snacks — delivered so you never have to pause the game.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════ TESTIMONIALS ════════════════════════════ -->
+<section id="reviews" class="py-28 relative" style="background:rgba(15,15,26,0.6)">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-16 reveal">
+      <p class="section-tag mb-3">Customer Reviews</p>
+      <h2 class="section-title">What People <span class="text-gold">Are Saying</span></h2>
+      <div class="flex items-center justify-center gap-3 mt-5">
+        <span class="stars">★★★★★</span>
+        <span style="font-family:'Bebas Neue',cursive;font-size:1.8rem;color:#d4a853">4.9</span>
+        <span class="text-smoke" style="font-size:0.9rem">on Google</span>
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8">
+      <!-- Review 1 -->
+      <div class="review-card reveal" style="transition-delay:.05s">
+        <div class="stars mb-4" style="position:relative;z-index:1">★★★★★</div>
+        <p class="text-smoke" style="font-size:0.93rem;line-height:1.8;margin-bottom:24px;position:relative;z-index:1">
+          "Honestly the best spot in Cairo for a chill night out. The Blueberry Mojito is absolutely incredible — we ordered two rounds! The private room felt exclusive and super comfortable. Will definitely be back."
+        </p>
+        <div style="display:flex;align-items:center;gap:12px;position:relative;z-index:1">
+          <div class="avatar" style="background:rgba(212,168,83,0.18);color:#d4a853">AK</div>
+          <div>
+            <p style="color:#fff;font-weight:600;font-size:0.92rem">Ahmed Karim</p>
+            <p class="text-smoke" style="font-size:0.8rem">Regular Guest · Cairo</p>
+          </div>
+        </div>
+      </div>
+      <!-- Review 2 -->
+      <div class="review-card reveal" style="transition-delay:.12s">
+        <div class="stars mb-4" style="position:relative;z-index:1">★★★★★</div>
+        <p class="text-smoke" style="font-size:0.93rem;line-height:1.8;margin-bottom:24px;position:relative;z-index:1">
+          "We brought the whole family and spent 3 hours — the kids were in gaming heaven and we were sipping those amazing Mojitos. The privacy makes such a difference, no strangers around at all. Perfect experience."
+        </p>
+        <div style="display:flex;align-items:center;gap:12px;position:relative;z-index:1">
+          <div class="avatar" style="background:rgba(0,212,255,0.12);color:#00d4ff">SR</div>
+          <div>
+            <p style="color:#fff;font-weight:600;font-size:0.92rem">Sara Ramadan</p>
+            <p class="text-smoke" style="font-size:0.8rem">Family Visit · Sheraton</p>
+          </div>
+        </div>
+      </div>
+      <!-- Review 3 -->
+      <div class="review-card reveal" style="transition-delay:.2s">
+        <div class="stars mb-4" style="position:relative;z-index:1">★★★★★</div>
+        <p class="text-smoke" style="font-size:0.93rem;line-height:1.8;margin-bottom:24px;position:relative;z-index:1">
+          "Went at 2 AM with friends after a long week and Risk was fully alive. PS5 setup was flawless, sound was insane, and the Passion Fruit Mojito hit different at that hour. This place runs 24/7 and it truly shows — quality never drops."
+        </p>
+        <div style="display:flex;align-items:center;gap:12px;position:relative;z-index:1">
+          <div class="avatar" style="background:rgba(212,168,83,0.18);color:#d4a853">MH</div>
+          <div>
+            <p style="color:#fff;font-weight:600;font-size:0.92rem">Mohamed Hassan</p>
+            <p class="text-smoke" style="font-size:0.8rem">Late Night · Verified Review</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ CONTACT / FOOTER ══════════════════════════ -->
+<section id="contact">
+  <div class="max-w-7xl mx-auto px-6 py-24">
+    <div class="text-center mb-16 reveal">
+      <p class="section-tag mb-3">Find Us</p>
+      <h2 class="section-title">Visit <span class="text-gold">Risk Cafe</span></h2>
+      <p class="text-smoke mt-4">We're in the heart of Sheraton Al Matar — easy to find, impossible to forget.</p>
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-12 items-start">
+      <!-- Details -->
+      <div class="reveal-left">
+        <div class="contact-detail">
+          <div class="detail-icon">📍</div>
+          <div>
+            <p style="color:#fff;font-weight:600;margin-bottom:3px">Address</p>
+            <p class="text-smoke" style="font-size:0.93rem;line-height:1.6">87 Seville Street, Sheraton Al Matar, Cairo, Egypt</p>
+          </div>
+        </div>
+        <div class="contact-detail">
+          <div class="detail-icon">📞</div>
+          <div>
+            <p style="color:#fff;font-weight:600;margin-bottom:3px">Phone</p>
+            <a href="tel:01155024757" style="color:#d4a853;font-size:1.1rem;font-weight:500;text-decoration:none">011 5502 4757</a>
+          </div>
+        </div>
+        <div class="contact-detail">
+          <div class="detail-icon">🕐</div>
+          <div>
+            <p style="color:#fff;font-weight:600;margin-bottom:3px">Hours</p>
+            <p class="text-cyan" style="font-size:1rem;font-weight:600">Open 24 Hours — Every Day</p>
+            <p class="text-smoke" style="font-size:0.85rem;margin-top:2px">No reservations needed · Walk in any time</p>
+          </div>
+        </div>
+        <div class="contact-detail">
+          <div class="detail-icon">⭐</div>
+          <div>
+            <p style="color:#fff;font-weight:600;margin-bottom:6px">Rating</p>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="stars">★★★★★</span>
+              <span class="rating-badge">4.9 / 5</span>
+            </div>
+          </div>
+        </div>
+        <!-- Direction CTA -->
+        <a href="https://maps.app.goo.gl/nwLAgyvmQ5mNUs118" target="_blank" rel="noopener" class="btn-primary mt-8" style="width:100%;justify-content:center">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Open in Google Maps
+        </a>
+      </div>
+      <!-- Map -->
+      <div class="reveal-right">
+        <div class="map-placeholder">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3452.2!2d31.3406!3d30.0958!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzDCsDA1JzQ0LjkiTiAzMcKwMjAnMjYuMiJF!5e0!3m2!1sen!2seg!4v1620000000000!5m2!1sen!2seg"
+            allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+            title="Risk Cafe & PlayStation Location">
+          </iframe>
+        </div>
+        <!-- Quick info chips -->
+        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:16px">
+          <span style="background:rgba(212,168,83,0.1);border:1px solid rgba(212,168,83,0.2);color:#d4a853;font-size:12px;padding:6px 14px;border-radius:999px">📍 Sheraton Al Matar</span>
+          <span style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);color:#00d4ff;font-size:12px;padding:6px 14px;border-radius:999px">🚗 Easy Parking</span>
+          <span style="background:rgba(212,168,83,0.1);border:1px solid rgba(212,168,83,0.2);color:#d4a853;font-size:12px;padding:6px 14px;border-radius:999px">🛏️ Private Rooms</span>
+          <span style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);color:#00d4ff;font-size:12px;padding:6px 14px;border-radius:999px">🌙 Open All Night</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer bottom bar -->
+  <div style="border-top:1px solid rgba(212,168,83,0.1);padding:24px 0">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+      <p class="text-smoke" style="font-size:0.85rem">© 2026 Risk Cafe & PlayStation</p>
+      <div style="display:flex;gap:20px">
+        <a href="tel:01155024757" style="color:#9898b0;font-size:0.85rem;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#d4a853'" onmouseout="this.style.color='#9898b0'">📞 011 5502 4757</a>
+        <a href="#hero" style="color:#9898b0;font-size:0.85rem;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#d4a853'" onmouseout="this.style.color='#9898b0'">↑ Back to Top</a>
+      </div>
+      <div style="display: flex; gap: 2rem;" >
+        <a href="https://www.facebook.com/profile.php?id=61558646374363" class="social" target="_blank"><i class="fa-brands fa-facebook"></i></a>
+        <a href="https://www.instagram.com/risk.cafe" class="social" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+        <a href="https://www.threads.com/@risk.cafe?xmt=AQF083aUi-lPfag7jZ-bI4LCochDnm51R3eHm1blyhqI-zo" class="social" target="_blank"><i class="fa-brands fa-threads"></i></a>
+      </div>
+    </div>
+  </div>
+  
+</section>
+
+<script>
+  // ── Navbar scroll ──
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  // ── Hamburger ──
+  const hamBtn = document.getElementById('ham-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  hamBtn.addEventListener('click', () => {
+    hamBtn.classList.toggle('active');
+    mobileMenu.classList.toggle('open');
+  });
+  mobileMenu.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      hamBtn.classList.remove('active');
+      mobileMenu.classList.remove('open');
+    });
+  });
+
+  // ── Scroll reveal ──
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => observer.observe(el));
+
+  // ── Smooth anchor scroll ──
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    });
+  });
+</script>
+</body>
+</html>
