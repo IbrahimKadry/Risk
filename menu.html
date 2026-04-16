@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Menu — Risk Cafe & PlayStation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" crossorigin="anonymous" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: { extend: {
+    fontFamily: {
+      display: ['Bebas Neue','cursive'],
+      serif:   ['Playfair Display','Georgia','serif'],
+      body:    ['Outfit','sans-serif'],
+    },
+    colors: {
+      night: { DEFAULT:'#08080f', 800:'#0f0f1a', 700:'#14141f', 600:'#1c1c2e' },
+      gold:  { DEFAULT:'#d4a853', light:'#e8c47a', dark:'#a07830' },
+      cyan:  { DEFAULT:'#00d4ff' },
+      smoke: { DEFAULT:'#9898b0', light:'#c5c5d8', dark:'#5a5a78' },
+    }
+  }}
+}
+</script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: #08080f; color: #c5c5d8; font-family: 'Outfit', sans-serif; overflow-x: hidden; min-height: 100vh; }
+
+/* Noise */
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity: .35;
+}
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: #08080f; }
+::-webkit-scrollbar-thumb { background: #d4a853; border-radius: 10px; }
+
+/* ── Navbar ── */
+#navbar {
+  position: fixed; top: 0; width: 100%; z-index: 100;
+  transition: background .4s, box-shadow .4s;
+}
+#navbar.scrolled {
+  background: rgba(8,8,15,0.92);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 1px 0 rgba(212,168,83,0.2);
+}
+.nav-link {
+  position: relative; font-weight: 500; font-size: 13px;
+  letter-spacing: .08em; text-transform: uppercase; color: #9898b0; transition: color .25s;
+  text-decoration: none;
+}
+.nav-link::after {
+  content: ''; position: absolute; left: 0; bottom: -4px;
+  width: 0; height: 1.5px; background: #d4a853; transition: width .3s;
+}
+.nav-link:hover, .nav-link.active { color: #d4a853; }
+.nav-link:hover::after, .nav-link.active::after { width: 100%; }
+
+/* ── Ham ── */
+.ham { display: flex; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+.ham span { display: block; width: 22px; height: 2px; background: #c5c5d8; border-radius: 2px; transition: all .3s; }
+.ham.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.ham.active span:nth-child(2) { opacity: 0; }
+.ham.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* Mobile menu */
+#mobile-menu {
+  display: none; flex-direction: column; gap: 4px;
+  background: rgba(8,8,15,0.97); backdrop-filter: blur(20px);
+  padding: 20px 24px; border-bottom: 1px solid rgba(212,168,83,0.15);
+}
+#mobile-menu.open { display: flex; }
+#mobile-menu a {
+  color: #9898b0; text-transform: uppercase; letter-spacing: .08em;
+  font-size: 13px; font-weight: 500; padding: 12px 0;
+  border-bottom: 1px solid rgba(212,168,83,0.07);
+  transition: color .2s; text-decoration: none;
+}
+#mobile-menu a:hover { color: #d4a853; }
+
+/* ── Hero / Page Header ── */
+.page-header {
+  padding: 140px 0 80px;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 100%, rgba(212,168,83,0.07) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 40% at 80% 20%, rgba(0,212,255,0.04) 0%, transparent 60%),
+    #08080f;
+  position: relative;
+}
+.page-header-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(212,168,83,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212,168,83,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 100%);
+}
+
+/* ── Tab Bar ── */
+.tab-scroll {
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+}
+.tab-scroll::-webkit-scrollbar { display: none; }
+.tab-bar {
+  display: flex; gap: 6px; padding: 0 24px;
+  min-width: max-content;
+}
+.tab-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 20px; border-radius: 999px; border: 1px solid rgba(212,168,83,0.18);
+  background: rgba(20,20,31,0.7); color: #9898b0;
+  font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 500;
+  letter-spacing: .05em; cursor: pointer; white-space: nowrap;
+  transition: all .25s; backdrop-filter: blur(6px);
+}
+.tab-btn .tab-icon { font-size: 15px; }
+.tab-btn:hover { color: #d4a853; border-color: rgba(212,168,83,0.4); }
+.tab-btn.active {
+  background: rgba(212,168,83,0.15);
+  border-color: rgba(212,168,83,0.55);
+  color: #d4a853;
+  box-shadow: 0 0 20px rgba(212,168,83,0.12);
+}
+
+/* ── Menu Panel ── */
+.menu-panel { display: none; }
+.menu-panel.active { display: block; }
+
+/* ── Item Card ── */
+.item-card {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; padding: 16px 20px;
+  background: rgba(20,20,31,0.75); border: 1px solid rgba(212,168,83,0.1);
+  border-radius: 10px; backdrop-filter: blur(6px);
+  transition: border-color .25s, transform .25s;
+}
+.item-card:hover {
+  border-color: rgba(212,168,83,0.35);
+  transform: translateX(4px);
+}
+.item-name { color: #e8e8f0; font-weight: 500; font-size: 0.95rem; line-height: 1.3; }
+.item-name-ar { font-size: 0.8rem; color: #9898b0; margin-top: 2px; }
+.item-price {
+  font-family: 'Bebas Neue', cursive; font-size: 1.4rem; color: #00d4ff;
+  letter-spacing: .04em; flex-shrink: 0; white-space: nowrap;
+}
+.item-price-note { font-size: 11px; color: #5a5a78; letter-spacing: .04em; display: block; text-align: right; }
+
+/* Dual price (single/double espresso etc) */
+.price-dual { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.price-dual .item-price { font-size: 1.1rem; }
+.price-dual .sep { color: #5a5a78; font-family: 'Outfit', sans-serif; font-size: 11px; }
+
+/* ── Category section ── */
+.cat-section-title {
+  font-family: 'Bebas Neue', cursive; font-size: 2.4rem; color: #fff;
+  letter-spacing: .04em; margin-bottom: 4px;
+}
+.cat-section-subtitle { font-size: 0.85rem; color: #9898b0; letter-spacing: .08em; text-transform: uppercase; }
+
+/* ── Divider ── */
+.cat-divider { display: flex; align-items: center; gap: 12px; margin: 40px 0 28px; }
+.cat-divider span { flex: 1; height: 1px; background: rgba(212,168,83,0.15); }
+.cat-divider em { color: #d4a853; font-style: normal; font-size: 18px; }
+
+/* ── Extras special ── */
+.extra-chip {
+  display: inline-flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px; background: rgba(20,20,31,0.75);
+  border: 1px solid rgba(212,168,83,0.1); border-radius: 8px;
+  transition: border-color .25s;
+}
+.extra-chip:hover { border-color: rgba(212,168,83,0.35); }
+
+/* ── Back btn ── */
+.btn-back {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: transparent; color: #9898b0; font-family: 'Outfit', sans-serif;
+  font-size: 13px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase;
+  padding: 10px 20px; border-radius: 4px; border: 1px solid rgba(212,168,83,0.2);
+  text-decoration: none; transition: all .25s;
+}
+.btn-back:hover { color: #d4a853; border-color: rgba(212,168,83,0.5); }
+
+/* ── Badge ── */
+.badge {
+  display: inline-block; font-size: 10px; font-weight: 600; letter-spacing: .08em;
+  text-transform: uppercase; padding: 3px 10px; border-radius: 999px;
+}
+.badge-gold { background: rgba(212,168,83,0.15); color: #d4a853; }
+.badge-cyan { background: rgba(0,212,255,0.1); color: #00d4ff; }
+
+/* ── WhatsApp float ── */
+.whatsapp-float {
+  position: fixed; width: 56px; height: 56px; bottom: 28px; right: 28px;
+  background: #25d366; color: #fff; border-radius: 50%; text-align: center;
+  font-size: 26px; box-shadow: 2px 2px 12px rgba(0,0,0,0.35); z-index: 999;
+  display: flex; align-items: center; justify-content: center; transition: transform .3s;
+  text-decoration: none;
+}
+.whatsapp-float:hover { transform: scale(1.1); background: #128c7e; }
+
+/* ── Reveal ── */
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity .6s, transform .6s; }
+.reveal.visible { opacity: 1; transform: none; }
+
+.text-gold { color: #d4a853; }
+.text-cyan  { color: #00d4ff; }
+.text-smoke { color: #9898b0; }
+
+/* ── Search box ── */
+.search-box {
+  width: 100%; max-width: 420px;
+  background: rgba(20,20,31,0.8); border: 1px solid rgba(212,168,83,0.2);
+  border-radius: 8px; padding: 12px 16px 12px 40px;
+  color: #c5c5d8; font-family: 'Outfit', sans-serif; font-size: 14px;
+  outline: none; transition: border-color .25s; backdrop-filter: blur(8px);
+}
+.search-box:focus { border-color: rgba(212,168,83,0.5); }
+.search-box::placeholder { color: #5a5a78; }
+.search-wrap { position: relative; }
+.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #5a5a78; font-size: 14px; pointer-events: none; }
+
+/* ── No results ── */
+.no-results { text-align: center; padding: 60px 0; color: #5a5a78; display: none; }
+.no-results.show { display: block; }
+</style>
+</head>
+<body>
+
+<!-- WhatsApp -->
+<a href="https://wa.me/201025649937?text=ممكن%20أعرف%20لو%20فيه%20أماكن%20متاحة%20دلوقتي؟" class="whatsapp-float" target="_blank" rel="noopener">
+  <i class="fab fa-whatsapp"></i>
+</a>
+
+<!-- ══════════ NAVBAR ══════════ -->
+<header id="navbar">
+  <nav class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between relative z-10">
+    <a href="index.html" class="flex items-center gap-3" style="text-decoration:none">
+      <div style="width:38px;height:38px;border-radius:8px;background:linear-gradient(135deg,#d4a853,#a07830);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',cursive;font-size:20px;color:#08080f;font-weight:700;flex-shrink:0">R</div>
+      <div>
+        <span style="font-family:'Bebas Neue',cursive;font-size:18px;color:#fff;letter-spacing:.06em">Risk</span>
+        <span style="font-family:'Outfit',sans-serif;font-size:10px;display:block;color:#9898b0;letter-spacing:.15em;text-transform:uppercase;line-height:1;margin-top:1px">Cafe & PlayStation</span>
+      </div>
+    </a>
+    <div class="hidden md:flex items-center gap-8">
+      <a href="index.html#about"   class="nav-link">About</a>
+      <a href="menu.html"          class="nav-link active">Menu</a>
+      <a href="index.html#gaming"  class="nav-link">Gaming</a>
+      <a href="index.html#reviews" class="nav-link">Reviews</a>
+      <a href="index.html#contact" class="nav-link">Contact</a>
+    </div>
+    <div class="flex items-center gap-4">
+      <a href="https://maps.app.goo.gl/nwLAgyvmQ5mNUs118" target="_blank" rel="noopener"
+        class="hidden md:inline-flex items-center gap-2"
+        style="background:#d4a853;color:#08080f;font-family:'Outfit',sans-serif;font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:10px 22px;border-radius:4px;text-decoration:none;transition:box-shadow .3s,transform .2s">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Directions
+      </a>
+      <button id="ham-btn" class="ham md:hidden" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+  <div id="mobile-menu">
+    <a href="index.html#about">About</a>
+    <a href="menu.html" style="color:#d4a853">Menu</a>
+    <a href="index.html#gaming">Gaming</a>
+    <a href="index.html#reviews">Reviews</a>
+    <a href="index.html#contact">Contact</a>
+    <a href="https://maps.app.goo.gl/nwLAgyvmQ5mNUs118" target="_blank" rel="noopener" style="color:#d4a853">📍 Get Directions</a>
+  </div>
+</header>
+
+<!-- ══════════ PAGE HEADER ══════════ -->
+<div class="page-header relative">
+  <div class="page-header-grid"></div>
+  <div class="max-w-7xl mx-auto px-6 relative z-10 text-center">
+    <a href="index.html" class="btn-back mb-8 inline-flex">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Back to Home
+    </a>
+    <p style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#d4a853;font-weight:600;margin-bottom:12px">Full Menu</p>
+    <h1 style="font-family:'Bebas Neue',cursive;font-size:clamp(3.5rem,8vw,7rem);color:#fff;line-height:.95;letter-spacing:.02em;margin-bottom:16px">
+      Everything <span class="text-gold">We Serve</span>
+    </h1>
+    <p class="text-smoke" style="font-size:1rem;max-width:480px;margin:0 auto;line-height:1.75">
+      12 categories · 100+ items · Prices in EGP. Browse by tab or search below.
+    </p>
+    <!-- Search -->
+    <div class="search-wrap" style="margin: 28px auto 0; max-width: 420px;">
+      <span class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+      <input id="search-input" class="search-box" type="text" placeholder="Search any item…" autocomplete="off" />
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ TAB BAR ══════════ -->
+<div style="position:sticky;top:72px;z-index:90;background:rgba(8,8,15,0.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(212,168,83,0.1);padding:14px 0;">
+  <div class="tab-scroll">
+    <div class="tab-bar" id="tab-bar">
+      <button class="tab-btn active" data-tab="hanksha">    <span class="tab-icon">🌯</span> Hanksha</button>
+      <button class="tab-btn" data-tab="icecream">          <span class="tab-icon">🍦</span> Ice Cream</button>
+      <button class="tab-btn" data-tab="juices">            <span class="tab-icon">🍊</span> Juices</button>
+      <button class="tab-btn" data-tab="smoothie">          <span class="tab-icon">🫐</span> Smoothie</button>
+      <button class="tab-btn" data-tab="milkshake">         <span class="tab-icon">🥤</span> Milkshake</button>
+      <button class="tab-btn" data-tab="soft">              <span class="tab-icon">🧃</span> Soft Drinks</button>
+      <button class="tab-btn" data-tab="frappe">            <span class="tab-icon">🧊</span> Frappé</button>
+      <button class="tab-btn" data-tab="hot">               <span class="tab-icon">☕</span> Hot Drinks</button>
+      <button class="tab-btn" data-tab="coffee">            <span class="tab-icon">☕</span> Coffee</button>
+      <button class="tab-btn" data-tab="icecoffee">         <span class="tab-icon">🧋</span> Ice Coffee</button>
+      <button class="tab-btn" data-tab="mojito">            <span class="tab-icon">🍹</span> Mojito</button>
+      <button class="tab-btn" data-tab="extra">             <span class="tab-icon">➕</span> Extras</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MENU CONTENT ══════════ -->
+<main class="max-w-7xl mx-auto px-6 py-16 relative z-10" id="menu-main">
+
+  <!-- No results -->
+  <div class="no-results" id="no-results">
+    <div style="font-size:40px;margin-bottom:12px">🔍</div>
+    <p style="font-size:1.1rem;color:#5a5a78">No items found. Try a different keyword.</p>
+  </div>
+
+  <!-- ── 1. HANKSHA ── -->
+  <div class="menu-panel active reveal" id="panel-hanksha">
+    <div class="flex items-end gap-4 mb-8">
+      <div>
+        <p class="cat-section-subtitle">Section 01</p>
+        <h2 class="cat-section-title">🌯 حنكشة <span style="color:#9898b0;font-size:1.4rem">· Hanksha</span></h2>
+      </div>
+    </div>
+    <div class="grid md:grid-cols-2 gap-4" id="grid-hanksha">
+      <!-- items injected by JS -->
+    </div>
+  </div>
+
+  <!-- ── 2. ICE CREAM ── -->
+  <div class="menu-panel reveal" id="panel-icecream">
+    <div class="flex items-end gap-4 mb-8">
+      <div>
+        <p class="cat-section-subtitle">Section 02</p>
+        <h2 class="cat-section-title">🍦 جيلاتي وحلويات <span style="color:#9898b0;font-size:1.4rem">· Ice Cream & Desserts</span></h2>
+      </div>
+    </div>
+    <div class="grid md:grid-cols-2 gap-4" id="grid-icecream"></div>
+  </div>
+
+  <!-- ── 3. JUICES ── -->
+  <div class="menu-panel reveal" id="panel-juices">
+    <div class="flex items-end gap-4 mb-8">
+      <div>
+        <p class="cat-section-subtitle">Section 03</p>
+        <h2 class="cat-section-title">🍊 عصائر فريش <span style="color:#9898b0;font-size:1.4rem">· Fresh Juices</span></h2>
+      </div>
+    </div>
+    <div class="grid md:grid-cols-2 gap-4" id="grid-juices"></div>
+  </div>
+
+  <!-- ── 4. SMOOTHIE ── -->
+  <div class="menu-panel reveal" id="panel-smoothie">
+    <div class="flex items-end gap-4 mb-8">
+      <div>
+        <p class="cat-section-subtitle">Section 04</p>
+        <h2 class="cat-section-title">🫐 سموزي <span style="color:#9898b0;font-size:1.4rem">· Smoothie</span></h2>
+      </div>
+    </div>
+    <div class="grid md:grid-cols-2 gap-4" id="grid-smoothie"></div>
+  </div>
+
+  <!-- ── 5. MILKSHAKE ── -->
+  <div class="menu-panel reveal" id="panel-milkshake">
+    <div class="flex items-end gap-4 mb-8">
+      <div>
+        <p class="cat-section-subtitle">Section 05</p>
+        <h2 class="cat-section-title">🥤 ميلك شيك <span style="color:#9898b0;font-size:1.4rem">· Milkshake</span></h2>
+      </div>
+    </div>
+    <div class="grid md:grid-cols-2 gap-4" id="grid-milkshake"></div>
+  </div>
+
+  <!-- ── 6. SOFT ── -->
+  <div class="menu-panel reveal" id="panel-soft">
+    <div class="flex items-end gap-4 mb-8">
+      <div>
+        <p class="cat-section-subtitle">Section 06</p>
+        <h2 class="cat-section-title">🧃 سوفت درينك <span style="color:#9898b0;font-size:1.4rem">· Soft Drinks</span></h2>
+      </div>
+    </div>
+    <div class="grid md:grid-cols-2 gap-4" id="grid-soft"></div>
+  </div>
+
+  <!-- ── 7. FRAPPE ── -->
+  <div class="menu-panel reveal" id="panel-frappe">
+    <div class="flex items-end gap-4 mb-8">
+      <div>
+        <p class="cat-section-subtitle">Section 07</p>
+        <h2 class="cat-section-title">🧊 فرابيه <span style="color:#9898b0;font-size:1.4rem">· Frappé</span></h2>
+      </div>
+    </div>
+    <div class="grid md:grid-cols-2 gap-4" id="grid-frappe"></div>
+  </div>
+
+  <!-- ── 8. HOT ── -->
+  <div class="menu-panel reveal" id="panel-hot">
+    <div class="flex items-end gap-4 mb-8">
+      <div>
+        <p class="cat-section-subtitle">Section 08</p>
+        <h2 class="cat-section-title">☕ مشروبات ساخنة <span style="color:#9898b0;font-size:1.4rem">· Hot Drinks</span></h2>
+      </div>
+    </div>
+    <div class="grid md:grid-cols-2 gap-4" id="grid-hot"></div>
+  </div>
+
+  <!-- ── 9. COFFEE ── -->
+  <div class="menu-panel reveal" id="panel-coffee">
+    <div class="flex items-end gap-4 mb-8">
+      <div>
+        <p class="cat-section-subtitle">Section 09</p>
+        <h2 class="cat-section-title">☕ قهوة <span style="color:#9898b0;font-size:1.4rem">· Coffee</span></h2>
+      </div>
+    </div>
+    <p class="text-smoke mb-6" style="font-size:0.85rem">
+      <span class="badge badge-gold">Single / Double</span> &nbsp; Items marked with two prices offer single &amp; double shot options.
+    </p>
+    <div class="grid md:grid-cols-2 gap-4" id="grid-coffee"></div>
+  </div>
+
+  <!-- ── 10. ICE COFFEE ── -->
+  <div class="menu-panel reveal" id="panel-icecoffee">
+    <div class="flex items-end gap-4 mb-8">
+      <div>
+        <p class="cat-section-subtitle">Section 10</p>
+        <h2 class="cat-section-title">🧋 ايس كوفي <span style="color:#9898b0;font-size:1.4rem">· Ice Coffee</span></h2>
+      </div>
+    </div>
+    <div class="grid md:grid-cols-2 gap-4" id="grid-icecoffee"></div>
+  </div>
+
+  <!-- ── 11. MOJITO ── -->
+  <div class="menu-panel reveal" id="panel-mojito">
+    <div class="flex items-end gap-4 mb-8">
+      <div>
+        <p class="cat-section-subtitle">Section 11</p>
+        <h2 class="cat-section-title">🍹 موهيتو <span style="color:#9898b0;font-size:1.4rem">· Mojito & Mocktails</span></h2>
+      </div>
+    </div>
+    <div class="grid md:grid-cols-2 gap-4" id="grid-mojito"></div>
+  </div>
+
+  <!-- ── 12. EXTRAS ── -->
+  <div class="menu-panel reveal" id="panel-extra">
+    <div class="flex items-end gap-4 mb-8">
+      <div>
+        <p class="cat-section-subtitle">Section 12</p>
+        <h2 class="cat-section-title">➕ اكسترا <span style="color:#9898b0;font-size:1.4rem">· Add-ons & Extras</span></h2>
+      </div>
+    </div>
+    <p class="text-smoke mb-6" style="font-size:0.85rem">Customise any drink or waffle with the extras below.</p>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="grid-extra"></div>
+  </div>
+
+  <!-- ══ Search results view ══ -->
+  <div id="search-results" style="display:none">
+    <p class="cat-section-subtitle mb-2" id="search-count-label"></p>
+    <h2 class="cat-section-title mb-8">Search <span class="text-gold">Results</span></h2>
+    <div class="grid md:grid-cols-2 gap-4" id="search-grid"></div>
+  </div>
+
+</main>
+
+<!-- ══════════ FOOTER ══════════ -->
+<footer style="border-top:1px solid rgba(212,168,83,0.1);padding:24px 0;background:#0f0f1a">
+  <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+    <p class="text-smoke" style="font-size:0.85rem">© 2026 Risk Cafe & PlayStation · 87 Seville Street, Sheraton Al Matar, Cairo</p>
+    <div style="display:flex;gap:20px;align-items:center">
+      <a href="tel:01155024757" style="color:#9898b0;font-size:0.85rem;text-decoration:none" onmouseover="this.style.color='#d4a853'" onmouseout="this.style.color='#9898b0'">📞 011 5502 4757</a>
+      <a href="https://www.instagram.com/risk.cafe" target="_blank" style="color:#9898b0;font-size:1rem;text-decoration:none" onmouseover="this.style.color='#d4a853'" onmouseout="this.style.color='#9898b0'"><i class="fa-brands fa-instagram"></i></a>
+      <a href="https://www.facebook.com/profile.php?id=61558646374363" target="_blank" style="color:#9898b0;font-size:1rem;text-decoration:none" onmouseover="this.style.color='#d4a853'" onmouseout="this.style.color='#9898b0'"><i class="fa-brands fa-facebook"></i></a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ═══════════════════ DATA ═══════════════════
+const MENU = {
+  hanksha: [
+    { en:'Jablawi Sandwich',   ar:'جبلاوي ساندويتش',   price:80  },
+    { en:'Bastawi Sandwich',   ar:'بسطاوي ساندويتش',   price:100 },
+    { en:'Abu Elrish Sandwich',ar:'أبو الريش ساندويتش', price:110 },
+    { en:'Salamony Sandwich',  ar:'سلاموني ساندويتش',  price:95  },
+    { en:'Popcorn',            ar:'فشار',               price:30  },
+    { en:'Caramel Popcorn',    ar:'فشار كراميل',        price:40  },
+  ],
+  icecream: [
+    { en:'Ice Cream',             ar:'ايس كريم',              price:30  },
+    { en:'Ice Cream Pot',         ar:'ايس كريم بوت',           price:90  },
+    { en:'Waffle Nutella',        ar:'وافل نوتيلا',            price:75  },
+    { en:'Waffle Fruit',          ar:'وافل فواكه',             price:85  },
+    { en:'Waffle Lotus',          ar:'وافل لوتس',              price:80  },
+    { en:'Nutella Lotus Waffle',  ar:'وافل نوتيلا لوتس',       price:75  },
+    { en:'Waffle White Chocolate',ar:'وافل شوكلاته بيضا',      price:75  },
+    { en:'Waffle Pistachio',      ar:'وافل بيستاشيو',          price:95  },
+    { en:'Abu Noman',             ar:'ابو نعمان',              price:55  },
+    { en:'Waffle Zaman',          ar:'وافل زمان',              price:65  },
+    { en:'Waffle Risk',           ar:'وافل ريسك',              price:90  },
+  ],
+  juices: [
+    { en:'Mango',         ar:'مانجو',          price:70 },
+    { en:'Strawberry',    ar:'فراولة',         price:60 },
+    { en:'Guava',         ar:'جوافة',          price:55 },
+    { en:'Orange',        ar:'برتقال',         price:60 },
+    { en:'Banana & Milk', ar:'موز باللبن',     price:55 },
+    { en:'Watermelon',    ar:'بطيخ',           price:65 },
+    { en:'Lemon Mint',    ar:'ليمون نعناع',    price:60 },
+    { en:'Tinshawkii',    ar:'تين شوكي',       price:65 },
+    { en:'Kiwi',          ar:'كيوي',           price:65 },
+    { en:'Balah & Milk',  ar:'بلح باللبن',     price:70 },
+    { en:'Dates & Milk',  ar:'تمر باللبن',     price:70 },
+  ],
+  smoothie: [
+    { en:'Mango',        ar:'مانجو',         price:70 },
+    { en:'Strawberry',   ar:'فراولة',        price:60 },
+    { en:'Lemon Mint',   ar:'ليمون نعناع',   price:60 },
+    { en:'Watermelon',   ar:'بطيخ',          price:65 },
+    { en:'Kiwi Mango',   ar:'مانجو كيوي',    price:75 },
+    { en:'Blueberry',    ar:'بلوي بيري',     price:70 },
+    { en:'Kiwi',         ar:'كيوي',          price:65 },
+  ],
+  milkshake: [
+    { en:'Mango',           ar:'مانجو',          price:75  },
+    { en:'Strawberry',      ar:'فراولة',         price:75  },
+    { en:'Lemon',           ar:'ليمون',          price:90  },
+    { en:'Chocolate',       ar:'شوكولاته',        price:75  },
+    { en:'Caramel',         ar:'كراميل',         price:75  },
+    { en:'Vanilla',         ar:'فانيليا',        price:75  },
+    { en:'Oreo',            ar:'اوريو',          price:80  },
+    { en:'Snickers',        ar:'اسنيكرز',        price:90  },
+    { en:'White Snickers',  ar:'وايت اسنيكرز',   price:90  },
+    { en:'Risk',            ar:'ريسك',           price:100, badge:'house' },
+    { en:'Lotus',           ar:'لوتس',           price:85  },
+    { en:'Nutella',         ar:'نوتيلا',         price:75  },
+    { en:'Cerelac',         ar:'سيريلاك',        price:75  },
+    { en:'Blueberry Yogurt',ar:'زبادي توت',      price:90  },
+    { en:'Biscuit',         ar:'بسكويت',         price:80  },
+    { en:'Dates',           ar:'تمر',            price:75  },
+    { en:'Pina Colada',     ar:'بينا كولادا',    price:110 },
+    { en:'Pineapple',       ar:'أناناس',         price:95  },
+  ],
+  soft: [
+    { en:'Small Water',  ar:'مياه',          price:10 },
+    { en:'V7',           ar:'V7',            price:40 },
+    { en:'Spirospits',   ar:'اسبيروسباتس',   price:35 },
+    { en:'Twist',        ar:'تووست',         price:45 },
+  ],
+  frappe: [
+    { en:'Frappechino',      ar:'فرابتشينو',      price:70 },
+    { en:'Mocha Frappe',     ar:'موكا',           price:80 },
+    { en:'White Mocha Frappe',ar:'وايت موكا',     price:85 },
+    { en:'Spanish Frappe',   ar:'اسبانش لاتيه',  price:90 },
+    { en:'Vanilla Frappe',   ar:'فانيليا',        price:80 },
+    { en:'Caramel Frappe',   ar:'كراميل',         price:80 },
+    { en:'Lotus Frappe',     ar:'لوتس',           price:90 },
+    { en:'Nutella Frappe',   ar:'نوتيلا',         price:95 },
+  ],
+  hot: [
+    { en:'Tea',                ar:'شاي',              price:23 },
+    { en:'Green Tea',          ar:'شاي اخضر',         price:25 },
+    { en:'Fruit Tea',          ar:'شاي فواكه',        price:30 },
+    { en:'Anise',              ar:'ينسون',            price:25 },
+    { en:'Mint',               ar:'نعناع',            price:25 },
+    { en:'Cinnamon & Milk',    ar:'قرفه باللبن',      price:35 },
+    { en:'Mix Herbs',          ar:'ميكس اعشاب',      price:40 },
+    { en:'Hot Ceder',          ar:'هوت سيدر',        price:45 },
+    { en:'Hot Chocolate',      ar:'هوت شوكلاته',     price:50 },
+    { en:'Hot White Chocolate',ar:'هوت وايت شوكليت',price:60 },
+    { en:'Hot Doum with Milk', ar:'دوم باللبن سخن',  price:50 },
+    { en:'Hot Dates with Milk',ar:'تمر باللبن سخن',  price:55 },
+  ],
+  coffee: [
+    { en:'Espresso',       ar:'اسبرسو',         price:40, price2:55  },
+    { en:'Macchiato',      ar:'ميكاتو',         price:45, price2:60  },
+    { en:'Americano',      ar:'امريكانو',        price:60            },
+    { en:'Cappuccino',     ar:'كابتشينو',        price:75            },
+    { en:'Latte',          ar:'لاتيه',           price:60            },
+    { en:'Spanish Latte',  ar:'اسبانش لاتيه',   price:80            },
+    { en:'Mocha',          ar:'موكا',            price:65            },
+    { en:'White Mocha',    ar:'وايت موكا',       price:70            },
+    { en:'Flat White',     ar:'فلات وايت',       price:70            },
+    { en:'Cortado',        ar:'كورتادو',         price:65            },
+    { en:'Affogato',       ar:'افوجتو',          price:50            },
+    { en:'Latte Lotus',    ar:'لاتيه لوتس',      price:90            },
+    { en:'Turkish Coffee', ar:'قهوة تركي',       price:33, price2:43  },
+    { en:'French Coffee',  ar:'قهوة فرنساوي',    price:48            },
+    { en:'Nutella Coffee', ar:'قهوة نوتيلا',     price:60            },
+    { en:'Hazelnut Coffee',ar:'قهوة بندق',       price:50            },
+    { en:'Vanilla Coffee', ar:'قهوة فانيلا',     price:50            },
+  ],
+  icecoffee: [
+    { en:'Ice Latte',              ar:'ايس كوفي',          price:80 },
+    { en:'Ice Mocha',              ar:'موكا',               price:85 },
+    { en:'Ice White Mocha',        ar:'وايت موكا',          price:85 },
+    { en:'Ice Caramel Macchiato',  ar:'ايس كراميل ميكاتو',  price:90 },
+    { en:'Ice Spanish Latte',      ar:'اسبانيش لاتيه',     price:90 },
+  ],
+  mojito: [
+    { en:'Mojito',          ar:'موهيتو',          price:70 },
+    { en:'Strawberry Mojito',ar:'موهيتو فراولة',  price:75 },
+    { en:'Redbull Forever', ar:'ريدبول فور ايفر', price:80 },
+    { en:'Pina Colada',     ar:'بينا كولادا',     price:80 },
+    { en:'Sea Breeze',      ar:'سي برايز',        price:60 },
+    { en:'Cola Cherry',     ar:'كولا شيري',       price:60 },
+    { en:'Baby Love',       ar:'بيبي لاف',        price:65 },
+    { en:'Sun Rise',        ar:'صان رايز',        price:65 },
+    { en:'Sun Shine',       ar:'صان شاين',        price:65 },
+    { en:'Blueberry Mojito',ar:'بلو بيري',        price:75 },
+    { en:'Passion Fruit Mojito',ar:'باشن فروت',   price:75, badge:'star' },
+  ],
+  extra: [
+    { en:'Milk',           ar:'لبن',         price:20 },
+    { en:'Espresso',       ar:'اسبرسو',      price:25 },
+    { en:'Lotus',          ar:'لوتس',        price:33 },
+    { en:'Nutella',        ar:'نوتيلا',      price:33 },
+    { en:'Flavor',         ar:'فليفر',       price:23 },
+    { en:'Topping',        ar:'توبينج',      price:25 },
+    { en:'Whipping Cream', ar:'كريمه',       price:18 },
+    { en:'Fruits',         ar:'فواكه',       price:25 },
+    { en:'Nuts',           ar:'مكسرات',      price:22 },
+    { en:'Cheese',         ar:'جبن',         price:20 },
+    { en:'Salami',         ar:'سلامي',       price:30 },
+    { en:'Turkey',         ar:'تركي',        price:40 },
+    { en:'Pastrami',       ar:'بسطرمة',      price:30 },
+  ],
+};
+
+// ═══════════════════ RENDER ═══════════════════
+function renderCard(item, isExtra = false) {
+  if (isExtra) {
+    return `
+    <div class="extra-chip">
+      <div>
+        <p class="item-name" style="font-size:0.88rem">${item.en}</p>
+        <p class="item-name-ar">${item.ar}</p>
+      </div>
+      <span class="item-price" style="font-size:1.2rem">+${item.price}</span>
+    </div>`;
+  }
+
+  let priceHtml;
+  if (item.price2) {
+    priceHtml = `
+      <div class="price-dual">
+        <span class="item-price">${item.price} <span class="sep">EGP</span></span>
+        <span class="sep">/ ${item.price2} EGP</span>
+      </div>`;
+  } else {
+    priceHtml = `<span class="item-price">${item.price}<span style="font-family:'Outfit',sans-serif;font-size:10px;color:#5a5a78;margin-left:3px">EGP</span></span>`;
+  }
+
+  const badge = item.badge === 'star'
+    ? `<span class="badge badge-gold" style="margin-left:8px">★ Signature</span>`
+    : item.badge === 'house'
+    ? `<span class="badge badge-cyan" style="margin-left:8px">House Special</span>`
+    : '';
+
+  return `
+  <div class="item-card">
+    <div>
+      <p class="item-name">${item.en}${badge}</p>
+      <p class="item-name-ar">${item.ar}</p>
+    </div>
+    ${priceHtml}
+  </div>`;
+}
+
+function populateGrids() {
+  Object.entries(MENU).forEach(([key, items]) => {
+    const isExtra = key === 'extra';
+    const grid = document.getElementById('grid-' + key);
+    if (!grid) return;
+    grid.innerHTML = items.map(i => renderCard(i, isExtra)).join('');
+  });
+}
+populateGrids();
+
+// ═══════════════════ TABS ═══════════════════
+const tabBtns = document.querySelectorAll('.tab-btn');
+const panels  = document.querySelectorAll('.menu-panel');
+const searchInput   = document.getElementById('search-input');
+const searchResults = document.getElementById('search-results');
+const searchGrid    = document.getElementById('search-grid');
+const searchCount   = document.getElementById('search-count-label');
+const noResults     = document.getElementById('no-results');
+
+function showTab(tabId) {
+  tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
+  panels.forEach(p => {
+    const active = p.id === 'panel-' + tabId;
+    p.classList.toggle('active', active);
+    if (active) setTimeout(() => p.classList.add('visible'), 50);
+  });
+  searchResults.style.display = 'none';
+  noResults.classList.remove('show');
+  searchInput.value = '';
+}
+
+tabBtns.forEach(btn => {
+  btn.addEventListener('click', () => showTab(btn.dataset.tab));
+});
+
+// ═══════════════════ SEARCH ═══════════════════
+function getAllItems() {
+  return Object.entries(MENU).flatMap(([cat, items]) =>
+    items.map(item => ({ ...item, cat }))
+  );
+}
+
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.trim().toLowerCase();
+  if (!q) {
+    searchResults.style.display = 'none';
+    noResults.classList.remove('show');
+    const activeTab = document.querySelector('.tab-btn.active');
+    if (activeTab) {
+      panels.forEach(p => {
+        const active = p.id === 'panel-' + activeTab.dataset.tab;
+        p.classList.toggle('active', active);
+      });
+    }
+    return;
+  }
+
+  // Hide all tab panels
+  panels.forEach(p => p.classList.remove('active'));
+
+  const matched = getAllItems().filter(item =>
+    item.en.toLowerCase().includes(q) || item.ar.includes(q)
+  );
+
+  if (matched.length === 0) {
+    searchResults.style.display = 'none';
+    noResults.classList.add('show');
+  } else {
+    noResults.classList.remove('show');
+    searchGrid.innerHTML = matched.map(i => renderCard(i, i.cat === 'extra')).join('');
+    searchCount.textContent = `${matched.length} item${matched.length > 1 ? 's' : ''} found`;
+    searchResults.style.display = 'block';
+  }
+});
+
+// ═══════════════════ NAVBAR SCROLL ═══════════════════
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
+});
+
+// ═══════════════════ HAMBURGER ═══════════════════
+const hamBtn = document.getElementById('ham-btn');
+const mobileMenu = document.getElementById('mobile-menu');
+hamBtn.addEventListener('click', () => {
+  hamBtn.classList.toggle('active');
+  mobileMenu.classList.toggle('open');
+});
+
+// ═══════════════════ REVEAL ═══════════════════
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); }});
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+// Activate initial panel reveal
+setTimeout(() => document.getElementById('panel-hanksha').classList.add('visible'), 100);
+</script>
+</body>
+</html>
